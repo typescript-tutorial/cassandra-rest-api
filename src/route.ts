@@ -11,6 +11,5 @@ export function route(app: Application, ctx: ApplicationContext): void {
   app.get('/users/:id', user.load);
   app.post('/users', user.insert);
   app.put('/users/:id', user.update);
-  app.patch('/users/:id', user.patch);
   app.delete('/users/:id', user.delete);
 }

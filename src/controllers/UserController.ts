@@ -7,7 +7,6 @@ export class UserController {
     this.load = this.load.bind(this);
     this.insert = this.insert.bind(this);
     this.update = this.update.bind(this);
-    this.patch = this.patch.bind(this);
     this.delete = this.delete.bind(this);
   }
 
@@ -48,21 +47,6 @@ export class UserController {
       return res.status(400).send('Id not match');
     }
     this.userService.update(user)
-      .then(result => res.status(200).json(result))
-      .catch(err => res.status(500).send(err));
-  }
-  patch(req: Request, res: Response) {
-    const id = req.params['id'];
-    if (!id || id.length === 0) {
-      return res.status(400).send('Id cannot be empty');
-    }
-    const user = req.body;
-    if (!user.id) {
-      user.id = id;
-    } else if (id !== user.id) {
-      return res.status(400).send('Id not match');
-    }
-    this.userService.patch(user)
       .then(result => res.status(200).json(result))
       .catch(err => res.status(500).send(err));
   }

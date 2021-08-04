@@ -1,32 +1,33 @@
 import {User} from '../../models/User';
 import {Client} from 'cassandra-driver';
-import { all,insert,load, update, deleteById, patch } from './cassandra';
 
 
 export class CassandraUserService {
   private readonly client: Client;
-  private readonly table = 'users';
-  private readonly id = 'id';
   constructor(db: Client) {
     this.client = db;
   }
 
   all(): Promise<User[]> {
-    return all<User>(this.client, this.table);
+    const query = `Select * from users`
+    return this.client.execute(query,undefined, {prepare:true}).then(res=> res.rows).catch(err => err)
   }
   load(id: string): Promise<User> {
-    return load<User>(this.client, this.table, this.id,id);
+    const query = `Select * from users where id=?`
+    return this.client.execute(query, [id], {prepare:true}).then(res => res.rows[0]).catch(err => err)
   }
   insert(user: User): Promise<number> {
-    return insert(this.client, this.table, user);
+    const query = `INSERT INTO users (id, username, email, phone, dateofbirth) VALUES (?,?,?,?,?) `
+    const params = [user.id,user.username,user.email,user.phone,user.dateOfBirth]
+    return this.client.execute(query, params, {prepare:true}).then(res => 1).catch(err => err)
   }
   update(user: User): Promise<number> {
-    return update(this.client, this.table, this.id, user);
-  }
-  patch(user: User): Promise<number> {
-    return patch(this.client, this.table,  this.id, user);
+    const query = `UPDATE users SET username = ?, email = ?, phone = ?, dateofbirth = ? WHERE id = ?`;
+    const params = [user.username,user.email,user.phone,user.dateOfBirth,user.id]
+    return this.client.execute(query, params, {prepare:true}).then(res => 1).catch(err => err)
   }
   delete(id: string): Promise<number> {
-    return deleteById(this.client, this.table, this.id, id);
+    const query = `DELETE FROM users WHERE id = ?`
+    return this.client.execute(query, [id], {prepare:true}).then(res => 1).catch(err => err)
   }
 }
